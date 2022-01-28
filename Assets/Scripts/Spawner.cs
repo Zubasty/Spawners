@@ -5,13 +5,16 @@ public class Spawner : MonoBehaviour
 {
     [SerializeField] private Enemy _enemyPrefab;
     [SerializeField] private PointSpawn[] _points;
-    [SerializeField] private float _delaySpawn;
+    [SerializeField] private float _timeDelay;
+    private WaitForSeconds _delay;
+
 
     private bool _canSpawn;
 
     private void Awake()
     {
-        _canSpawn = true;      
+        _canSpawn = true;
+        _delay = new WaitForSeconds(_timeDelay);
     }
 
     private void Start()
@@ -21,21 +24,20 @@ public class Spawner : MonoBehaviour
 
     private void OnValidate()
     {
-        if (_delaySpawn <= 0)
+        if (_timeDelay <= 0)
         {
-            _delaySpawn = 1;
+            _timeDelay = 1;
             Debug.LogError("Количество секунд между спавнами должно быть положительным");
         }
     }
 
     private IEnumerator Spawning()
     {
-        WaitForSeconds delay = new WaitForSeconds(_delaySpawn);
         while (_canSpawn)
         {
             Vector3 position = _points[Random.Range(0, _points.Length)].transform.position;
             Instantiate(_enemyPrefab, position, Quaternion.identity);
-            yield return delay;
+            yield return _delay;
         }
         yield return null;
     }
